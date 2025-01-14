@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white"
     android:theme="@style/ThemeOverlay.SunriseTV.FullscreenContainer"
     tools:context=".ui.activities.MainActivity">
@@ -15,20 +16,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:visibility="gone"
         android:keepScreenOn="true"
         android:text="@string/dummy_content"
         android:textColor="?attr/fullscreenTextColor"
         android:textSize="50sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:visibility="gone" />
 
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        android:visibility="gone">
 
         <LinearLayout
             android:id="@+id/fullscreen_content_controls"
@@ -45,8 +46,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:visibility="gone"
-                android:text="@string/dummy_button" />
+                android:text="@string/dummy_button"
+                android:visibility="gone" />
 
         </LinearLayout>
     </FrameLayout>
@@ -57,39 +58,112 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY"
-        android:src="@drawable/sunrise_cargo"/>
+        android:src="@drawable/sunrise_cargo" />
 
-    <ViewFlipper
-        android:id="@+id/view_flipper"
+    <FrameLayout
+        android:id="@+id/tracking_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:autoStart="true"
-        android:flipInterval="2000"
-        android:inAnimation="@android:anim/slide_in_left"
-        android:outAnimation="@android:anim/slide_out_right">
+        android:background="@color/white"
+        android:layout_height="match_parent">
 
-    <!-- First View -->
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:src="@drawable/image1"
-        android:scaleType="centerCrop" />
 
-    <!-- Second View -->
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:src="@drawable/image2"
-        android:scaleType="centerCrop" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="10">
 
-    <!-- Third View -->
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:src="@drawable/image3"
-        android:scaleType="centerCrop" />
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_weight="4"
+                android:layout_height="match_parent">
 
-</ViewFlipper>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:orientation="vertical">
+
+                    <ViewFlipper
+                        android:id="@+id/view_flipper1"
+                        android:layout_width="match_parent"
+                        android:layout_height="65dp"
+                        android:autoStart="true"
+                        android:flipInterval="2000"
+                        android:inAnimation="@android:anim/slide_in_left"
+                        android:outAnimation="@android:anim/slide_out_right"/>
+
+                    <ViewFlipper
+                        android:id="@+id/view_flipper2"
+                        android:layout_width="match_parent"
+                        android:layout_height="65dp"
+                        android:autoStart="true"
+                        android:flipInterval="2000"
+                        android:inAnimation="@android:anim/slide_in_left"
+                        android:outAnimation="@android:anim/slide_out_right"/>
+
+                    <ViewFlipper
+                        android:id="@+id/view_flipper3"
+                        android:layout_width="match_parent"
+                        android:layout_height="65dp"
+                        android:autoStart="true"
+                        android:flipInterval="2000"
+                        android:inAnimation="@android:anim/slide_in_left"
+                        android:outAnimation="@android:anim/slide_out_right"/>
+
+                    <ViewFlipper
+                        android:id="@+id/view_flipper4"
+                        android:layout_width="match_parent"
+                        android:layout_height="65dp"
+                        android:autoStart="true"
+                        android:flipInterval="2000"
+                        android:inAnimation="@android:anim/slide_in_left"
+                        android:outAnimation="@android:anim/slide_out_right"/>
+
+                    <ViewFlipper
+                        android:id="@+id/view_flipper5"
+                        android:layout_width="match_parent"
+                        android:layout_height="65dp"
+                        android:autoStart="true"
+                        android:flipInterval="2000"
+                        android:inAnimation="@android:anim/slide_in_left"
+                        android:outAnimation="@android:anim/slide_out_right"/>
+
+                    <ViewFlipper
+                        android:id="@+id/view_flipper6"
+                        android:layout_width="match_parent"
+                        android:layout_height="65dp"
+                        android:autoStart="true"
+                        android:flipInterval="2000"
+                        android:inAnimation="@android:anim/slide_in_left"
+                        android:outAnimation="@android:anim/slide_out_right"/>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_weight="6"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/sunrise_cargo" />
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+
+
+    </FrameLayout>
+
 
 
 

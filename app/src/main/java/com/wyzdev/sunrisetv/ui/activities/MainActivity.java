@@ -14,9 +14,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.GestureDetector;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowInsets;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.TextView;
+import android.widget.ViewFlipper;
 
 import com.wyzdev.sunrisetv.databinding.ActivityMainBinding;
 import com.wyzdev.sunrisetv.R;
@@ -26,6 +32,8 @@ import com.wyzdev.sunrisetv.receivers.SunriseAdminReceiver;
 import com.wyzdev.sunrisetv.tools.APIClient;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Call;
@@ -48,6 +56,19 @@ public class MainActivity extends AppCompatActivity {
      * user interaction before hiding the system UI.
      */
     private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
+
+    private static final int SWIPE_MIN_DISTANCE = 120;
+    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+    View view;
+    private GestureDetector detector;
+    public Animation.AnimationListener mAnimationListener;
+    int sales_by_fliper = 1;
+
+
+    List<Integer> flippers = Arrays.asList(R.id.view_flipper1, R.id.view_flipper2, R.id.view_flipper3, R.id.view_flipper3, R.id.view_flipper4, R.id.view_flipper5, R.id.view_flipper6);
+
+
+    HashMap<Integer, List<Tracking>> list_by_flipper;
 
     /**
      * Some older devices needs a small delay between UI widget updates
@@ -183,7 +204,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void startRefreshTask(){
-
         Handler handler = new Handler();
         Runnable runnableCode = new Runnable() {
             @Override
@@ -244,26 +264,22 @@ public class MainActivity extends AppCompatActivity {
 
     public void getPackageStatus(){
         try{
+            AsyncTask.execute(() -> APIClient.getClient().create(APIInterface.class).getFlightPackages(null, null, null, 5L, null)
+                    .enqueue(new Callback<List<Tracking>>() {
+                        @Override
+                        public void onResponse(Call<List<Tracking>> call, Response<List<Tracking>> response) {
+                            if(response.isSuccessful()){
+                                runOnUiThread(() -> showPackages(response.body()));
+                            }else{
+                                runOnUiThread(() -> binding.trackingContainer.setVisibility(View.GONE));
+                            }
+                        }
 
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    APIClient.getClient().create(APIInterface.class).getFlightPackages(null, null, null, 5L, null)
-                            .enqueue(new Callback<List<Tracking>>() {
-                                @Override
-                                public void onResponse(Call<List<Tracking>> call, Response<List<Tracking>> response) {
-                                    if(response.isSuccessful()){
-
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<List<Tracking>> call, Throwable t) {
-
-                                }
-                            });
-                }
-            });
+                        @Override
+                        public void onFailure(Call<List<Tracking>> call, Throwable t) {
+                            runOnUiThread(() -> binding.trackingContainer.setVisibility(View.GONE));
+                        }
+                    }));
 
         }catch (Exception e){
 
@@ -272,5 +288,74 @@ public class MainActivity extends AppCompatActivity {
 
     public void showPackages(List<Tracking> trackingList){
 
+        if(trackingList.isEmpty()){
+            binding.trackingContainer.setVisibility(View.GONE);
+        }else{
+            binding.trackingContainer.setVisibility(View.VISIBLE);
+        }
+
+        list_by_flipper = new HashMap<>();
+        for(int i = 0 ; i < flippers.size(); i++){
+            list_by_flipper.put(i, new ArrayList<>());
+        }
+
+        int flipper = -1;
+        for(Tracking sale : trackingList){
+            if(flipper < (flippers.size() - 1)){
+                flipper++;
+            }else{
+                flipper = 0;
+            }
+
+            List<Tracking> temp_list = list_by_flipper.get(flipper);
+            temp_list.add(sale);
+            list_by_flipper.put(flipper, temp_list);
+        }
+
+        flipper = 0;
+
+        for(Integer id : flippers){
+            ViewFlipper viewFlipper = findViewById(id);
+            viewFlipper.removeAllViews();
+            viewFlipper.setAutoStart(true);
+            viewFlipper.setFlipInterval(10000);
+            viewFlipper.startFlipping();
+            viewFlipper.setInAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.push_up_in));
+            viewFlipper.setOutAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.push_up_out));
+
+            if(list_by_flipper.containsKey(flipper)){
+                for(Tracking sale : list_by_flipper.get(flipper)){
+                    setFlipperItem(viewFlipper, sale);
+                }
+            }
+
+            flipper++;
+        }
+
+
+
+
+        for(Integer id : flippers){
+            ViewFlipper viewFlipper = findViewById(id);
+            viewFlipper.setDisplayedChild(0);
+        }
+
     }
+
+    private void setFlipperItem(ViewFlipper flipper, Tracking tracking) {
+
+        TextView tvBarcode;
+
+        view = LayoutInflater.from(this).inflate(R.layout.item_tracking, null, false);
+        tvBarcode = view.findViewById(R.id.tv_barcode);
+
+        try{
+            tvBarcode.setText(tracking.product.barcode);
+        }catch (Exception e){
+
+        }
+
+        flipper.addView(view);
+    }
+
 }
