@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Sunrise TV</string>
+    <string name="title_activity_main">Sunrise TV</string>
+    <string name="dummy_button">Sunrise</string>
+    <string name="dummy_content">Sunrise</string>
+</resources>
