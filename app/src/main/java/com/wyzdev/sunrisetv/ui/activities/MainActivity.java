@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 startRefreshTask();
             }
-        }, 30000);
+        }, 20000);
 
     }
 
