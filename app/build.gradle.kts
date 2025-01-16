@@ -42,7 +42,8 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.retrofit) // Dernière version stable de Retrofit
     implementation(libs.converter.gson) // Convertisseur Gson pour Retrofit
-
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
+    implementation("androidx.recyclerview:recyclerview:1.3.0")
     implementation(libs.logging.interceptor)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

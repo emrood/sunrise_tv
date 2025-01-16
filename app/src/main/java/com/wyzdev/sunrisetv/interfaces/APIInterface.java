@@ -68,7 +68,7 @@ public interface APIInterface {
     Call<List<Movement>> getMovements();
 
     @GET("truck_stations")
-    Call<List<TruckStation>> getTruckStations(@Query("orderdesc") String orderDesc, @Query("station_id") Long stationId);
+    Call<List<TruckStation>> getTruckStations(@Nullable @Query("orderdesc") String orderDesc, @Nullable @Query("include") String include, @Nullable @Query("station_id") Long stationId);
 
     @GET("sales")
     Call<List<Sale>> searchSale(@Query("sale_number") String saleNumber);

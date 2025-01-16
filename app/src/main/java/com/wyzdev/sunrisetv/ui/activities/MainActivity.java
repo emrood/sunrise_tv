@@ -4,11 +4,14 @@ import android.annotation.SuppressLint;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.content.AsyncTaskLoader;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,8 +31,10 @@ import com.wyzdev.sunrisetv.databinding.ActivityMainBinding;
 import com.wyzdev.sunrisetv.R;
 import com.wyzdev.sunrisetv.interfaces.APIInterface;
 import com.wyzdev.sunrisetv.models.Tracking;
+import com.wyzdev.sunrisetv.models.TruckStation;
 import com.wyzdev.sunrisetv.receivers.SunriseAdminReceiver;
 import com.wyzdev.sunrisetv.tools.APIClient;
+import com.wyzdev.sunrisetv.ui.adapters.TruckStationAdapter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
     private GestureDetector detector;
     public Animation.AnimationListener mAnimationListener;
     int sales_by_fliper = 1;
+
+    private Handler sliderHandler = new Handler(Looper.getMainLooper());
 
 
     List<Integer> flippers = Arrays.asList(R.id.view_flipper1, R.id.view_flipper2, R.id.view_flipper3, R.id.view_flipper3, R.id.view_flipper4, R.id.view_flipper5, R.id.view_flipper6);
@@ -193,6 +200,12 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(intent, 205);
         }
 
+        Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.banner_video);
+        binding.videoView.setVideoURI(videoUri);
+        binding.videoView.start();
+        binding.videoView.setVisibility(View.VISIBLE);
+
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -209,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 getPackageStatus();
+                getPrices();
                 handler.postDelayed(this, 1800000);
             }
         };
@@ -264,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void getPackageStatus(){
         try{
-            AsyncTask.execute(() -> APIClient.getClient().create(APIInterface.class).getFlightPackages(null, null, null, 5L, null)
+            AsyncTask.execute(() -> APIClient.getClient().create(APIInterface.class).getFlightPackages(null, null, null, null, null)
                     .enqueue(new Callback<List<Tracking>>() {
                         @Override
                         public void onResponse(Call<List<Tracking>> call, Response<List<Tracking>> response) {
@@ -290,55 +304,59 @@ public class MainActivity extends AppCompatActivity {
 
         if(trackingList.isEmpty()){
             binding.trackingContainer.setVisibility(View.GONE);
+
         }else{
+
             binding.trackingContainer.setVisibility(View.VISIBLE);
-        }
 
-        list_by_flipper = new HashMap<>();
-        for(int i = 0 ; i < flippers.size(); i++){
-            list_by_flipper.put(i, new ArrayList<>());
-        }
-
-        int flipper = -1;
-        for(Tracking sale : trackingList){
-            if(flipper < (flippers.size() - 1)){
-                flipper++;
-            }else{
-                flipper = 0;
+            list_by_flipper = new HashMap<>();
+            for(int i = 0 ; i < flippers.size(); i++){
+                list_by_flipper.put(i, new ArrayList<>());
             }
 
-            List<Tracking> temp_list = list_by_flipper.get(flipper);
-            temp_list.add(sale);
-            list_by_flipper.put(flipper, temp_list);
-        }
-
-        flipper = 0;
-
-        for(Integer id : flippers){
-            ViewFlipper viewFlipper = findViewById(id);
-            viewFlipper.removeAllViews();
-            viewFlipper.setAutoStart(true);
-            viewFlipper.setFlipInterval(10000);
-            viewFlipper.startFlipping();
-            viewFlipper.setInAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.push_up_in));
-            viewFlipper.setOutAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.push_up_out));
-
-            if(list_by_flipper.containsKey(flipper)){
-                for(Tracking sale : list_by_flipper.get(flipper)){
-                    setFlipperItem(viewFlipper, sale);
+            int flipper = -1;
+            for(Tracking sale : trackingList){
+                if(flipper < (flippers.size() - 1)){
+                    flipper++;
+                }else{
+                    flipper = 0;
                 }
+
+                List<Tracking> temp_list = list_by_flipper.get(flipper);
+                temp_list.add(sale);
+                list_by_flipper.put(flipper, temp_list);
             }
 
-            flipper++;
+            flipper = 0;
+
+            for(Integer id : flippers){
+                ViewFlipper viewFlipper = findViewById(id);
+                viewFlipper.removeAllViews();
+                viewFlipper.setAutoStart(true);
+                viewFlipper.setFlipInterval(10000);
+                viewFlipper.startFlipping();
+                viewFlipper.setInAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.push_up_in));
+                viewFlipper.setOutAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.push_up_out));
+
+                if(list_by_flipper.containsKey(flipper)){
+                    for(Tracking sale : list_by_flipper.get(flipper)){
+                        setFlipperItem(viewFlipper, sale);
+                    }
+                }
+
+                flipper++;
+            }
+
+
+
+
+            for(Integer id : flippers){
+                ViewFlipper viewFlipper = findViewById(id);
+                viewFlipper.setDisplayedChild(0);
+            }
         }
 
 
-
-
-        for(Integer id : flippers){
-            ViewFlipper viewFlipper = findViewById(id);
-            viewFlipper.setDisplayedChild(0);
-        }
 
     }
 
@@ -358,4 +376,77 @@ public class MainActivity extends AppCompatActivity {
         flipper.addView(view);
     }
 
+
+    public void getPrices(){
+        try{
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    APIClient.getClient().create(APIInterface.class).getTruckStations(null, "truck,station", 1L)
+                            .enqueue(new Callback<List<TruckStation>>() {
+                                @Override
+                                public void onResponse(Call<List<TruckStation>> call, Response<List<TruckStation>> response) {
+                                    if (response.isSuccessful() && !response.body().isEmpty()){
+                                        showPrices(response.body());
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<List<TruckStation>> call, Throwable t) {
+
+                                }
+                            });
+                }
+            });
+        }catch (Exception e){
+
+        }
+
+    }
+
+
+
+    public void showPrices(List<TruckStation> truckStations){
+        try{
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try{
+                        TruckStationAdapter adapter = new TruckStationAdapter(truckStations);
+                        binding.viewPager.setAdapter(adapter);
+                        binding.viewPager.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
+                        autoScrollViewPager(truckStations.size());
+                    }catch (Exception e){
+
+                    }
+                }
+            });
+
+        }catch (Exception e){
+
+        }
+    }
+
+    public void autoScrollViewPager(int itemCount){
+        try{
+            sliderHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    int current = binding.viewPager.getCurrentItem();
+                    int next = (current + 1) % itemCount;
+                    binding.viewPager.setCurrentItem(next, true);
+                    sliderHandler.postDelayed(this, 3000);
+                }
+            }, 3000);
+        }catch (Exception e){
+
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        sliderHandler.removeCallbacksAndMessages(null);
+    }
 }
