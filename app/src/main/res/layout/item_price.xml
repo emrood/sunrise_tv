@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -16,14 +16,18 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="120dp"
+            android:layout_margin="8dp"
             android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_gravity="center"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:gravity="center"
+                android:padding="8dp">
 
                 <TextView
                     android:id="@+id/tv_product_name"
@@ -38,6 +42,7 @@
                     android:id="@+id/description"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     tools:text="Description"
                     android:textSize="14sp" />
 
@@ -49,23 +54,37 @@
                 android:background="@color/purple_200"/>
 
             <RelativeLayout
-                android:layout_width="120dp"
+                android:layout_width="200dp"
                 android:layout_height="match_parent">
 
 
-
-                <TextView
-                    android:id="@+id/tv_price"
-                    android:layout_centerInParent="true"
+                <androidx.cardview.widget.CardView
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:textColor="@color/black"
-                    tools:text="Title"
-                    android:gravity="center"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:background="@drawable/tag_one"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:elevation="8dp"
+                    android:layout_margin="8dp"
+                    card_view:cardCornerRadius="10dp">
+
+                    <TextView
+                        android:id="@+id/tv_price"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:textColor="@color/black"
+                        tools:text="20 USD / Lbs"
+                        android:gravity="center"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:background="@drawable/custom_gradient"/>
+
+                </androidx.cardview.widget.CardView>
+
+
+
 
             </RelativeLayout>
 

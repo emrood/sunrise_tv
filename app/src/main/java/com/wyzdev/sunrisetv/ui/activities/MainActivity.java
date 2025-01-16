@@ -382,7 +382,7 @@ public class MainActivity extends AppCompatActivity {
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {
-                    APIClient.getClient().create(APIInterface.class).getTruckStations(null, "truck,station", 1L)
+                    APIClient.getClient().create(APIInterface.class).getTruckStations("id", "truck,station", 1L)
                             .enqueue(new Callback<List<TruckStation>>() {
                                 @Override
                                 public void onResponse(Call<List<TruckStation>> call, Response<List<TruckStation>> response) {
@@ -436,9 +436,9 @@ public class MainActivity extends AppCompatActivity {
                     int current = binding.viewPager.getCurrentItem();
                     int next = (current + 1) % itemCount;
                     binding.viewPager.setCurrentItem(next, true);
-                    sliderHandler.postDelayed(this, 3000);
+                    sliderHandler.postDelayed(this, 8000);
                 }
-            }, 3000);
+            }, 8000);
         }catch (Exception e){
 
         }
