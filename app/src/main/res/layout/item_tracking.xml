@@ -38,7 +38,7 @@
             <ImageView
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
-                android:src="@mipmap/ic_launcher"/>
+                android:src="@drawable/landing"/>
 
         </LinearLayout>
 
